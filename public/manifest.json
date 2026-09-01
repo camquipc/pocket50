@@ -1,0 +1,19 @@
+{
+  "name": "Tasa5030",
+  "short_name": "Tasa5030",
+  "description": "PWA de finanzas personales con regla 50/30/20 para Venezuela",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#242424",
+  "theme_color": "#fbf0df",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "productivity"]
+}
