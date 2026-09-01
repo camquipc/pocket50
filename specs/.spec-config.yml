@@ -1,0 +1,6 @@
+# spec workflow configuration
+#
+# AutoCreateBranch — controls whether /spec-impl creates the git branch automatically.
+#   true  (default) → /spec-impl creates and switches to spec-01-pwa-finance-503020 without asking
+#   false           → /spec-impl asks for [y/N] confirmation before creating the branch
+AutoCreateBranch: true
