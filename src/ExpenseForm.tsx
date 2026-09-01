@@ -12,6 +12,7 @@ interface ExpenseFormProps {
     subcategoria: string;
   }) => Promise<void>;
   disabled?: boolean;
+  tasaInicial?: number | null;
 }
 
 function suggestCategory(text: string): CategoryKey | null {
@@ -26,16 +27,23 @@ function suggestCategory(text: string): CategoryKey | null {
   return null;
 }
 
-export function ExpenseForm({ onSubmit, disabled }: ExpenseFormProps) {
+export function ExpenseForm({ onSubmit, disabled, tasaInicial }: ExpenseFormProps) {
   const [montoVES, setMontoVES] = useState("");
-  const [tasa, setTasa] = useState("");
+  const [tasa, setTasa] = useState(tasaInicial != null ? String(tasaInicial) : "");
   const [descripcion, setDescripcion] = useState("");
   const [categoria, setCategoria] = useState<CategoryKey | "">("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Actualizar tasa cuando cambia la prop tasaInicial
+  useEffect(() => {
+    if (tasaInicial != null) {
+      setTasa(String(tasaInicial));
+    }
+  }, [tasaInicial]);
+
   const montoVESNum = parseFloat(montoVES) || 0;
-  const tasaNum = parseFloat(tasa) || 1;
-  const montoUSD = montoVESNum > 0 ? montoVESNum / tasaNum : 0;
+  const tasaNum = parseFloat(tasa) || 0;
+  const montoUSD = montoVESNum > 0 && tasaNum > 0 ? montoVESNum / tasaNum : 0;
 
   // Auto-sugerir categoría al escribir descripción
   const handleDescripcionChange = useCallback((value: string) => {
@@ -94,7 +102,7 @@ export function ExpenseForm({ onSubmit, disabled }: ExpenseFormProps) {
           type="number"
           value={tasa}
           onChange={(e) => setTasa(e.target.value)}
-          placeholder="36.50"
+          placeholder={tasaInicial != null ? undefined : "Ingresa tasa manual"}
           min="0.01"
           step="0.01"
           required

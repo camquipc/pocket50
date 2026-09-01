@@ -105,6 +105,67 @@ function setConfig(key, value) {
   sheet.appendRow([key, value]);
 }
 
+// ============================================================
+// TASA DE CAMBIO — Proxy ve.dolarapi.com
+// ============================================================
+
+const BCV_API_URL = 'https://ve.dolarapi.com/v1/dolares/oficial';
+const TASA_KEY = 'tasa_usd_hoy';
+const TASA_FECHA_KEY = 'tasa_fecha';
+
+function getCurrentDate() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+function isTasaCacheFresh() {
+  const fechaCache = getConfig(TASA_FECHA_KEY);
+  if (!fechaCache) return false;
+  return fechaCache === getCurrentDate();
+}
+
+function fetchYTasaFromBCV() {
+  try {
+    const response = UrlFetchApp.fetch(BCV_API_URL, {
+      muteHttpExceptions: true,
+      followRedirects: true,
+    });
+    const json = JSON.parse(response.getContentText());
+    const tasa = json.promedio;
+    if (typeof tasa !== 'number' || tasa <= 0) {
+      throw new Error('Tasa inválida en respuesta: ' + JSON.stringify(json));
+    }
+    setConfig(TASA_KEY, tasa);
+    setConfig(TASA_FECHA_KEY, getCurrentDate());
+    return { valor: Math.round(tasa * 100) / 100, fuente: 'bcv', fecha: getCurrentDate(), manual: false };
+  } catch (error) {
+    Logger.log('Error consultando API BCV: ' + error.toString());
+    return null;
+  }
+}
+
+function getTasaDelDia() {
+  // 1. Si la cache es de hoy, usarla
+  if (isTasaCacheFresh()) {
+    const tasaCache = parseFloat(getConfig(TASA_KEY));
+    if (tasaCache > 0) {
+      return { valor: tasaCache, fuente: 'cache', fecha: getConfig(TASA_FECHA_KEY), manual: false };
+    }
+  }
+  // 2. Consultar API
+  const resultado = fetchYTasaFromBCV();
+  if (resultado) {
+    return resultado;
+  }
+  // 3. Fallback: usar cache vieja si existe
+  const tasaVieja = parseFloat(getConfig(TASA_KEY));
+  if (tasaVieja > 0) {
+    return { valor: tasaVieja, fuente: 'cache', fecha: getConfig(TASA_FECHA_KEY) || 'desconocida', manual: false };
+  }
+  // 4. Sin datos disponibles
+  return { valor: null, fuente: 'manual', fecha: getCurrentDate(), manual: true };
+}
+
 function recalcularMesActual() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const gastosSheet = ss.getSheetByName(SHEET_GASTOS);
@@ -241,12 +302,14 @@ function doGet(e) {
     // Default: retornar estado del mes actual
     const summary = getMesActualSummary();
     const alerts = checkAlerts(summary);
+    const tasa = getTasaDelDia();
     
     return ContentService
       .createTextOutput(JSON.stringify({ 
         success: true, 
         summary: summary,
-        alerts: alerts
+        alerts: alerts,
+        tasa: tasa
       }))
       .setMimeType(ContentService.MimeType.JSON);
       

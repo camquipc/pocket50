@@ -27,10 +27,18 @@ interface Alert {
   message: string;
 }
 
+interface TasaInfo {
+  valor: number | null;
+  fuente: "bcv" | "cache" | "manual";
+  fecha: string;
+  manual: boolean;
+}
+
 interface ExpenseResponse {
   success: boolean;
   summary?: Record<string, CategorySummary>;
   alerts?: Alert[];
+  tasa?: TasaInfo;
   error?: string;
 }
 
@@ -109,6 +117,7 @@ async function fetchWithRetry<T>(
 }
 
 export { ApiError };
+export type { TasaInfo };
 
 export async function submitExpense(data: SubmitExpenseData): Promise<ExpenseResponse> {
   return fetchWithRetry<ExpenseResponse>(GAS_ENDPOINT, {

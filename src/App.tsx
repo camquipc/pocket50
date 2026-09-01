@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { ExpenseForm } from "./ExpenseForm";
 import { BudgetDashboard } from "./BudgetDashboard";
 import { AlertToast } from "./AlertToast";
-import { getBudgetStatus, submitExpense, ApiError } from "./api";
-import { CATEGORIES } from "./config";
+import { getBudgetStatus, submitExpense, ApiError, type TasaInfo } from "./api";
+import { CATEGORIES, DEFAULT_TASA } from "./config";
 import "./index.css";
 
 type CategoryKey = keyof typeof CATEGORIES;
@@ -35,6 +35,7 @@ export function App() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tasa, setTasa] = useState<TasaInfo | null>(null);
 
   const fetchData = useCallback(async () => {
     setError(null);
@@ -48,6 +49,9 @@ export function App() {
       }
       if (data.alerts) {
         setAlerts(data.alerts);
+      }
+      if (data.tasa) {
+        setTasa(data.tasa);
       }
     } catch (err) {
       const msg =
@@ -95,6 +99,15 @@ export function App() {
         <header className="text-center">
           <h1 className="text-3xl font-bold text-[#fbf0df]">Tasa5030</h1>
           <p className="text-[#fbf0df]/70 text-sm">Finanzas personales • Regla 50/30/20</p>
+          {tasa && (
+            <p className="text-[#fbf0df]/60 text-xs mt-1">
+              {tasa.valor !== null ? (
+                <>Tasa: {tasa.valor.toFixed(2)} Bs/$ ({tasa.fuente === "bcv" ? "BCV" : "Cache"}, {tasa.fecha})</>
+              ) : (
+                <span className="text-yellow-400">Tasa no disponible — ingresa manual</span>
+              )}
+            </p>
+          )}
         </header>
 
         {/* Loading */}
@@ -123,7 +136,11 @@ export function App() {
         )}
 
         {/* Formulario */}
-        <ExpenseForm onSubmit={handleSubmit} disabled={loading} />
+        <ExpenseForm
+          onSubmit={handleSubmit}
+          disabled={loading}
+          tasaInicial={tasa?.valor ?? DEFAULT_TASA}
+        />
 
         {/* Footer */}
         <footer className="text-center text-[#fbf0df]/50 text-xs py-4">
