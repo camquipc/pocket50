@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "pocket50",
     "public": "dist",
     "ignore": [
       "firebase.json",
