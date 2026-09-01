@@ -1,6 +1,6 @@
 # SPEC 01 — PWA Finanzas 50/30/20 Venezuela
 
-> **Status:**aprobado
+> **Status:** implementado
 > **Depends on:** —
 > **Date:** 2026-09-01
 > **Objective:** PWA de finanzas personales que registra gastos en VES, los convierte a USD vía API BCV, y aplica la regla 50/30/20 con alertas visuales de presupuesto.

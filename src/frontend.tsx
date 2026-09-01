@@ -16,6 +16,12 @@ const app = (
   </StrictMode>
 );
 
+// Agregar manifest para PWA
+const manifestLink = document.createElement('link');
+manifestLink.rel = 'manifest';
+manifestLink.href = '/manifest.json';
+document.head.appendChild(manifestLink);
+
 // Registrar service worker para PWA
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
