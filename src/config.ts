@@ -1,7 +1,7 @@
 // Pocket50 — Configuración del cliente
 // Cambiar GAS_ENDPOINT después de desplegar el Google Apps Script
 
-export const GAS_ENDPOINT = 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec';
+export const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzb9Hb9iKGcZJ1V2fSgg-ia4G4ncjL41-TWFxf7Hdf0mma-20CPvxJgX2a8c1y-Yyvq/exec';
 
 export const CATEGORIES = {
   need: { label: 'Necesidades', pct: 50 },
