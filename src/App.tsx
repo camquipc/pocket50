@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ExpenseForm } from "./ExpenseForm";
 import { BudgetDashboard } from "./BudgetDashboard";
 import { AlertToast } from "./AlertToast";
-import { getBudgetStatus, submitExpense } from "./api";
+import { getBudgetStatus, submitExpense, ApiError } from "./api";
 import { CATEGORIES } from "./config";
 import "./index.css";
 
@@ -37,19 +37,24 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
+    setError(null);
+    setLoading(true);
     try {
       const data = await getBudgetStatus();
       if (data.success && data.summary) {
         setSummary(data.summary);
-        // Calcular ingreso mensual desde el summary (need * 2 = 100%)
         const needLimit = data.summary.need?.limit || 0;
         setIngresoMensual(Math.round(needLimit * 2 * 100) / 100);
       }
       if (data.alerts) {
         setAlerts(data.alerts);
       }
-    } catch {
-      setError("No se pudo conectar al servidor. Verifica tu conexión.");
+    } catch (err) {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : "No se pudo conectar al servidor. Verifica tu conexión.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -101,8 +106,14 @@ export function App() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-900/50 border border-red-500 rounded-xl p-4 text-red-300 text-center">
-            {error}
+          <div className="bg-red-900/50 border border-red-500 rounded-xl p-4 text-red-300 text-center flex flex-col gap-3">
+            <p>{error}</p>
+            <button
+              onClick={fetchData}
+              className="mx-auto px-4 py-2 bg-red-700 hover:bg-red-600 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+            >
+              Reintentar
+            </button>
           </div>
         )}
 
