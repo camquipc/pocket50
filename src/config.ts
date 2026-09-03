@@ -3,8 +3,6 @@
 
 export const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzb9Hb9iKGcZJ1V2fSgg-ia4G4ncjL41-TWFxf7Hdf0mma-20CPvxJgX2a8c1y-Yyvq/exec';
 
-export const DEFAULT_TASA = 36.50;
-
 export const CATEGORIES = {
   need: { label: 'Necesidades', pct: 50 },
   want: { label: 'Deseos', pct: 30 },

@@ -3,7 +3,7 @@ import { ExpenseForm } from "./ExpenseForm";
 import { BudgetDashboard } from "./BudgetDashboard";
 import { AlertToast } from "./AlertToast";
 import { getBudgetStatus, submitExpense, ApiError, type TasaInfo } from "./api";
-import { CATEGORIES, DEFAULT_TASA } from "./config";
+import { CATEGORIES } from "./config";
 import "./index.css";
 
 type CategoryKey = keyof typeof CATEGORIES;
@@ -139,7 +139,7 @@ export function App() {
         <ExpenseForm
           onSubmit={handleSubmit}
           disabled={loading}
-          tasaInicial={tasa?.valor ?? DEFAULT_TASA}
+          tasaInicial={tasa?.valor ?? null}
         />
 
         {/* Footer */}
